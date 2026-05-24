@@ -1,7 +1,20 @@
 import javax.swing.*
-import javax.swing.SwingConstants.LEADING
+import javax.swing.SwingConstants.CENTER
 import java.awt.*
 
+// I asked an AI for a little help on this code and one of its recommendations was these two enum classes and
+// this data class. This helped me get a better idea about what I needed to do to get the pieces on the board.
+// Also, the AI wanted me to name the first enum class Color, which interfered with other parts of the code,
+// so I renamed it PieceColor.
+enum class PieceColor { WHITE, BLACK}
+
+enum class PieceType {
+    PAWN, KING, QUEEN, ROOK, KNIGHT, BISHOP
+}
+
+data class Piece(val color: PieceColor, val type: PieceType)
+
+//I also got some ideas from https://zetcode.com/kotlin/swing/
 class ChessBoard(title: String) : JFrame() {
     init{
         createUI(title)
@@ -20,10 +33,18 @@ class ChessBoard(title: String) : JFrame() {
         )
 
         val labels = boardPattern.map {
-            JLabel("", null, LEADING).apply {
+            JLabel("", null, CENTER).apply {
                 minimumSize = Dimension(100, 100)
                 background = it
                 isOpaque = true
+            }
+        }
+
+        val board = createStartingBoard()
+        for(row in 0 until 8){
+            for(col in 0 until 8){
+                val index = row * 8 + col
+                setSquareIcon(labels[index], board[row][col])
             }
         }
 
@@ -222,5 +243,45 @@ class ChessBoard(title: String) : JFrame() {
                 )
         )
         pack()
+    }
+
+    private fun backRank(color: PieceColor, col: Int): Piece {
+        val type = when (col) {
+            0, 7 -> PieceType.ROOK
+            1, 6 -> PieceType.KNIGHT
+            2, 5 -> PieceType.BISHOP
+            3 -> PieceType.QUEEN
+            else -> PieceType.KING
+        }
+        return Piece(color, type)
+    }
+
+    private fun createStartingBoard(): Array<Array<Piece?>> {
+        return Array(8){ row ->
+            Array(8){ col ->
+                when(row){
+                    1 -> Piece(PieceColor.BLACK, PieceType.PAWN)
+                    6 -> Piece(PieceColor.WHITE, PieceType.PAWN)
+                    0 -> backRank(PieceColor.BLACK, col)
+                    7 -> backRank(PieceColor.WHITE, col)
+                    else -> null
+                }
+            }
+        }
+    }
+
+    private fun pieceImagePath(piece: Piece): String {
+        val color = piece.color.name.lowercase()
+        val type = piece.type.name.lowercase()
+        return "Assets/${color}_$type.png"
+    }
+
+    private fun setSquareIcon(label: JLabel, piece: Piece?){
+        if(piece == null) {
+            label.icon = null
+        } else {
+            val path = pieceImagePath(piece)
+            label.icon = ImageIcon(path)
+        }
     }
 }
