@@ -32,6 +32,7 @@ class ChessBoard(title: String) : JFrame() {
             Color.black, Color.white, Color.black, Color.white, Color.black, Color.white, Color.black, Color.white
         )
 
+        // Map colors to board
         val labels = boardPattern.map {
             JLabel("", null, CENTER).apply {
                 minimumSize = Dimension(100, 100)
@@ -40,6 +41,7 @@ class ChessBoard(title: String) : JFrame() {
             }
         }
 
+        // Put pieces on board
         val board = createStartingBoard()
         for(row in 0 until 8){
             for(col in 0 until 8){
@@ -48,6 +50,7 @@ class ChessBoard(title: String) : JFrame() {
             }
         }
 
+        // Create board
         createLayout(labels)
 
         setTitle(title)
@@ -256,6 +259,7 @@ class ChessBoard(title: String) : JFrame() {
         return Piece(color, type)
     }
 
+    // All Ranks
     private fun createStartingBoard(): Array<Array<Piece?>> {
         return Array(8){ row ->
             Array(8){ col ->
@@ -270,6 +274,8 @@ class ChessBoard(title: String) : JFrame() {
         }
     }
 
+    // These two functions set the icons for the squares as the images for the pieces making so the pieces can
+    // be seen.
     private fun pieceImagePath(piece: Piece): String {
         val color = piece.color.name.lowercase()
         val type = piece.type.name.lowercase()
